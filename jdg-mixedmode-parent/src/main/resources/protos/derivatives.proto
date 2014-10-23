@@ -1,0 +1,36 @@
+package com.askitis.jdg.domain;
+
+option java_outer_classname = "Derivatives";
+
+message DerivativeProduct {
+
+	required string id = 1;
+	required string name = 2;
+	required string type = 3;
+	required FormulaPrice formulaprice = 4;
+	required FormulaLine formulaline = 5;
+	required BalmoProductCode balmoproductcode = 6;
+
+
+   message FormulaPrice {
+	required string id = 1;
+	required string name = 2;
+	required int64 price = 3;
+	repeated DerivativeProduct derivativeproducts = 4;
+   }
+   
+   message FormulaLine {
+	required string id = 1;
+	required string name = 2;
+	required string type = 3;
+	repeated DerivativeProduct derivativeproducts = 4;
+   }
+   
+   message BalmoProductCode {
+	required string id = 1;
+	required string name = 2;
+	required string type = 3;
+	repeated DerivativeProduct derivativeproducts = 4;
+   }
+
+}

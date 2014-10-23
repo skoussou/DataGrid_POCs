@@ -1,0 +1,332 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.askitis.consulting</groupId>
+  <artifactId>jdg-mixedmode-parent</artifactId>
+  <version>1.0.0</version>
+  <description>Modules To Create a Setup with JDG Embedded and Server caches</description>
+  <packaging>pom</packaging>
+  <modules>
+  	<module>jdg-mixedmode-web-capacity-zero</module>
+  	<module>jdg-mixedmode-data-loader</module>
+  	<module>jdg-mixedmode-map-reducer</module>
+  </modules>
+  
+   <properties>
+		<!-- Explicitly declaring the source encoding eliminates the following 
+			message: -->
+		<!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered 
+			resources, i.e. build is platform dependent! -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- JBoss dependency versions -->
+		<version.jboss.maven.plugin>7.4.Final</version.jboss.maven.plugin>
+		<version.jboss.bom.eap>6.2.0.GA</version.jboss.bom.eap>
+		<!--version.org.infinispan>6.1.0.Final-redhat-4</version.org.infinispan-->
+		<version.org.infinispan>6.1.1.Final-redhat-5</version.org.infinispan>
+
+		<!-- other plugin versions -->
+		<version.war.plugin>2.1.1</version.war.plugin>
+		<version.surefire.plugin>2.10</version.surefire.plugin>
+
+		<!-- maven-compiler-plugin -->
+		<maven.compiler.target>1.6</maven.compiler.target>
+		<maven.compiler.source>1.6</maven.compiler.source>
+
+        <ant.plugin.version>1.7</ant.plugin.version>
+
+		<!-- Remote Server URL -->
+		<remote.server.url>http://localhost:8080/</remote.server.url>
+	</properties>
+  
+  	<dependencyManagement>
+		<dependencies>
+			<!-- Define the version of JBoss' Java EE 6 APIs we want to import. Any 
+				dependencies from org.jboss.spec will have their version defined by this 
+				BOM -->
+			<!-- JBoss distributes a complete set of Java EE 6 APIs including a Bill 
+				of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
+				of artifacts. We use this here so that we always get the correct versions 
+				of artifacts. Here we use the jboss-javaee-6.0 stack (you can read this as 
+				the JBoss stack of the Java EE 6 APIs). You can actually use this stack with 
+				any version of JBoss EAP that implements Java EE 6. -->
+			<dependency>
+				<groupId>org.jboss.bom.eap</groupId>
+				<artifactId>jboss-javaee-6.0-with-tools</artifactId>
+				<version>${version.jboss.bom.eap}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+            <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-bom</artifactId>
+                <version>${version.org.infinispan}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+			
+            <!-- JDG Dependencies -->
+            <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-core</artifactId>
+                <version>${version.org.infinispan}</version>
+                <!-- scope>compile</scope>
+                <scope>provided</scope -->
+            </dependency>
+			
+            <!-- Hot Rod Client with Querying -->
+            <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-commons</artifactId>
+                <version>${version.org.infinispan}</version>
+                <!--scope>compile</scope-->
+            </dependency>
+
+			<!-- JDG Library Search -->
+			<dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-query</artifactId>
+                <version>${version.org.infinispan}</version>
+                <!-- scope>compile</scope>
+                <scope>compile</scope-->
+			</dependency>
+
+			<!-- JDBC CacheStore -->
+			<dependency>
+		        <groupId>org.infinispan</groupId>
+		        <artifactId>infinispan-cachestore-jdbc</artifactId>
+		        <version>${version.org.infinispan}</version>
+		        <!--scope>compile</scope-->
+			</dependency>
+			
+			<!-- JDBC Class for cachestore -->
+	        <dependency>
+		        <groupId>c3p0</groupId>
+		        <artifactId>c3p0</artifactId>
+		        <version>0.9.1.2</version>
+	        </dependency>	
+			
+			<!-- Hot Rod Client with Querying -->
+			<dependency>
+			<groupId>org.infinispan</groupId>
+		        <artifactId>infinispan-client-hotrod</artifactId>
+		        <version>${version.org.infinispan}</version>
+		        <!--scope>compile</scope-->
+			</dependency>
+		
+			<dependency>
+			<groupId>org.infinispan</groupId>
+		        <artifactId>infinispan-remote-query-client</artifactId>
+		        <version>${version.org.infinispan}</version>
+		        <!--scope>compile</scope-->
+			</dependency>
+
+			<dependency>
+		        <groupId>org.infinispan</groupId>
+		        <artifactId>infinispan-query-dsl</artifactId>
+		        <version>${version.org.infinispan}</version>
+		        <!--scope>compile</scope-->
+			</dependency>			
+			
+		<!-- JGROUPS Dependency for Manual Transport (MIXED-MODE, also look at 
+			jboss-deployment-structure.xml -->
+			<dependency>
+		        <groupId>org.jboss.modules</groupId>
+		        <artifactId>jboss-modules</artifactId>
+		        <version>1.2.2.Final-redhat-1</version>
+		        <!--scope>compile</scope-->
+			</dependency>
+		
+			<dependency>
+		        <groupId>org.jgroups</groupId>
+		        <artifactId>jgroups</artifactId>
+		        <version>3.4.4.Final-redhat-5</version>
+		        <!--scope>provided</scope-->
+			</dependency>			
+			
+			<!-- Import the CDI API, we use provided scope as the API is included in 
+			JBoss EAP 6 -->
+			<dependency>
+		        <groupId>javax.enterprise</groupId>
+		        <artifactId>cdi-api</artifactId>
+		        <version>1.2</version>
+		        <!--scope>provided</scope-->
+			</dependency>
+
+			<!-- Import the Servlet API, we use provided scope as the API is included 
+			in JBoss EAP 6 -->
+			<dependency>
+		        <groupId>org.jboss.spec.javax.servlet</groupId>
+		        <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+		        <version>1.0.2.Final</version>
+		        <!--scope>provided</scope-->
+			</dependency>
+			
+			<dependency>
+		        <groupId>org.jboss.spec.javax.ejb</groupId>
+		        <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+		        <version>1.0.2.Final-redhat-2</version>
+		        <!--scope>provided</scope-->
+			</dependency>	
+		
+			<!-- Import the Common Annotations API (JSR-250), we use provided scope 
+			as the API is included in JBoss EAP 6 -->
+			<dependency>
+		        <groupId>org.jboss.spec.javax.annotation</groupId>
+		        <artifactId>jboss-annotations-api_1.1_spec</artifactId>
+		        <version>1.0.1.Final</version>
+		        <!--scope>provided</scope-->
+			</dependency>
+			
+			<!-- Test dependencies -->
+			<dependency>
+		        <groupId>junit</groupId>
+		        <artifactId>junit</artifactId>
+		        <scope>test</scope>
+		        <version>4.10</version>
+			</dependency>
+			
+			<dependency>
+		        <groupId>org.jboss.arquillian.junit</groupId>
+		        <artifactId>arquillian-junit-container</artifactId>
+		        <scope>test</scope>
+		        <version>1.1.5.Final</version>
+			</dependency>			
+		</dependencies>
+
+	</dependencyManagement>
+
+	<dependencies>
+
+
+
+		<!-- JDBC CacheStore >
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-cachestore-jdbc</artifactId>
+			<version>${version.org.infinispan}</version>
+			<scope>compile</scope>
+		</dependency-->
+		
+
+		
+		<!-- Hot Rod Client with Querying >
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-commons</artifactId>
+			<version>${version.org.infinispan}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-client-hotrod</artifactId>
+			<version>${version.org.infinispan}</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-remote-query-client</artifactId>
+			<version>${version.org.infinispan}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-query-dsl</artifactId>
+			<version>${version.org.infinispan}</version>
+			<scope>compile</scope>
+		</dependency-->
+
+		<!-- Import the CDI API, we use provided scope as the API is included in 
+			JBoss EAP 6>
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<version>1.2</version>
+			<scope>provided</scope>
+		</dependency -->
+
+		<!-- Import the Servlet API, we use provided scope as the API is included 
+			in JBoss EAP 6 >
+		<dependency>
+			<groupId>org.jboss.spec.javax.servlet</groupId>
+			<artifactId>jboss-servlet-api_3.0_spec</artifactId>
+			<version>1.0.2.Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.1_spec</artifactId>
+			<version>1.0.2.Final-redhat-2</version>
+			<scope>provided</scope>
+		</dependency-->		
+
+
+		<!-- JGROUPS Dependency for Manual Transport (MIXED-MODE, also look at 
+			jboss-deployment-structure.xml >
+		<dependency>
+           <groupId>org.jboss.modules</groupId>
+           <artifactId>jboss-modules</artifactId>
+           <version>1.2.2.Final-redhat-1</version>
+		   <scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.jgroups</groupId>
+            <artifactId>jgroups</artifactId>
+            <version>3.4.4.Final-redhat-5</version>
+		   <scope>provided</scope>
+		</dependency-->
+		
+		<!-- Import the Common Annotations API (JSR-250), we use provided scope 
+			as the API is included in JBoss EAP 6 >
+		<dependency>
+			<groupId>org.jboss.spec.javax.annotation</groupId>
+			<artifactId>jboss-annotations-api_1.1_spec</artifactId>
+			<version>1.0.1.Final</version>
+			<scope>provided</scope>
+		</dependency-->
+
+		<!-- Import the JPA API, we use provided scope as the API is included in 
+			JBoss EAP 6 >
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.0-api</artifactId>
+			<scope>provided</scope>
+		</dependency-->
+
+		<!-- Test dependencies >
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+			<version>4.10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+			<version>1.1.5.Final</version>
+		</dependency-->
+
+	</dependencies>
+	
+	<build>
+	<pluginManagement>
+	  		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.war.plugin}</version>
+			</plugin>
+			<!--  JBoss AS plugin to deploy war > -->
+			<plugin>
+				<groupId>org.jboss.as.plugins</groupId>
+				<artifactId>jboss-as-maven-plugin</artifactId>
+				<version>${version.jboss.maven.plugin}</version>
+			</plugin>
+		</plugins>
+	</pluginManagement>	
+	</build>
+</project>

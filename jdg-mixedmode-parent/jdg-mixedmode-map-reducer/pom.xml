@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.askitis.consulting</groupId>
+    <artifactId>jdg-mixedmode-parent</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <artifactId>jdg-mixedmode-map-reducer</artifactId>
+  <name>jdg-mixedmode-map-reducer - JDG Server module to run map-reduce task</name>
+
+   	<dependencies>
+ 		<!-- JDG Dependencies -->
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-core</artifactId>
+			<!-- version>${version.org.infinispan}</version> -->
+			<scope>compile</scope>
+			<!-- scope>provided</scope -->
+		</dependency>
+	
+		<!-- JDG Library Search -->
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-query</artifactId>
+			<!-- version>${version.org.infinispan}</version> -->
+			<scope>compile</scope>
+		</dependency>	
+		
+				<!-- Import the CDI API, we use provided scope as the API is included in 
+			JBoss EAP 6 -->
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<!-- version>1.2</version-->
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- Import the Common Annotations API (JSR-250), we use provided scope 
+			as the API is included in JBoss EAP 6 >
+		<dependency>
+			<groupId>org.jboss.spec.javax.annotation</groupId>
+			<artifactId>jboss-annotations-api_1.1_spec</artifactId>
+			<version>1.0.1.Final</version>
+			<scope>provided</scope>
+		</dependency-->		
+		
+			<!-- Import the JPA API, we use provided scope as the API is included in 
+			JBoss EAP 6 >
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.0-api</artifactId>
+			<scope>provided</scope>
+		</dependency-->
+		
+		<!-- Import the Common Annotations API (JSR-250), we use provided scope 
+			as the API is included in JBoss EAP 6 >
+		<dependency>
+			<groupId>org.jboss.spec.javax.annotation</groupId>
+			<artifactId>jboss-annotations-api_1.1_spec</artifactId>
+			<version>1.0.1.Final</version>
+			<scope>provided</scope>
+		</dependency-->		
+		
+	</dependencies>
+		
+</project>

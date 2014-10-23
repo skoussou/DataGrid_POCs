@@ -1,0 +1,936 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project name="BP-RDS" resourceRoot="" soapui-version="4.0.1" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="RdsJDGDataLoadServiceSoapBinding" type="wsdl" bindingName="{http://www.askitis.com/jdg/load}RdsJDGDataLoadServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load?wsdl"><con:part><con:url>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="RdsJDGDataLoadService" targetNamespace="http://www.askitis.com/jdg/load" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.askitis.com/jdg/load" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://www.askitis.com/jdg/load" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="getAllJDGDataByMapReduceKeys" type="tns:getAllJDGDataByMapReduceKeys"/>
+      <xs:element name="getAllJDGDataByMapReduceKeysResponse" type="tns:getAllJDGDataByMapReduceKeysResponse"/>
+      <xs:element name="loadJDGData" type="tns:loadJDGData"/>
+      <xs:element name="loadJDGDataResponse" type="tns:loadJDGDataResponse"/>
+      <xs:element name="retrieveDGData" type="tns:retrieveDGData"/>
+      <xs:element name="retrieveDGDataResponse" type="tns:retrieveDGDataResponse"/>
+      <xs:element name="searchAllJDGData" type="tns:searchAllJDGData"/>
+      <xs:element name="searchAllJDGDataResponse" type="tns:searchAllJDGDataResponse"/>
+      <xs:element name="startCache" type="tns:startCache"/>
+      <xs:element name="startCacheResponse" type="tns:startCacheResponse"/>
+      <xs:complexType name="getAllJDGDataByMapReduceKeys">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getAllJDGDataByMapReduceKeysResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="CacheRetrieveResult" type="tns:derivativeProduct"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="derivativeProduct">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="balmoproductcode" type="tns:balmoProductCode"/>
+          <xs:element minOccurs="0" name="formulaline" type="tns:formulaLine"/>
+          <xs:element minOccurs="0" name="formulaprice" type="tns:formulaPrice"/>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="type" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="balmoProductCode">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="type" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="formulaLine">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="type" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="formulaPrice">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="price" type="xs:integer"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="startCache">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="startCacheResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheStartResult" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="retrieveDGData">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+          <xs:element minOccurs="0" name="DataFrom" type="tns:dataLocation"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="retrieveDGDataResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheRetrieveResult" type="tns:derivativesDTO"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="derivativesDTO">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="searchAllJDGData">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+          <xs:element minOccurs="0" name="DataFrom" type="tns:dataLocation"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="searchAllJDGDataResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="CacheRetrieveResult" type="tns:derivativeProduct"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="loadJDGData">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="loadJDGDataResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheLoadResult" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="mode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="REMOTE"/>
+          <xs:enumeration value="EMBEDDED"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="dataLocation">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="JDG"/>
+          <xs:enumeration value="DB"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="retrieveDGDataResponse">
+    <wsdl:part element="tns:retrieveDGDataResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="retrieveDGData">
+    <wsdl:part element="tns:retrieveDGData" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAllJDGDataByMapReduceKeys">
+    <wsdl:part element="tns:getAllJDGDataByMapReduceKeys" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="loadJDGData">
+    <wsdl:part element="tns:loadJDGData" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="startCache">
+    <wsdl:part element="tns:startCache" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="searchAllJDGData">
+    <wsdl:part element="tns:searchAllJDGData" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="loadJDGDataResponse">
+    <wsdl:part element="tns:loadJDGDataResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="searchAllJDGDataResponse">
+    <wsdl:part element="tns:searchAllJDGDataResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="startCacheResponse">
+    <wsdl:part element="tns:startCacheResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAllJDGDataByMapReduceKeysResponse">
+    <wsdl:part element="tns:getAllJDGDataByMapReduceKeysResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="RdsJDGDataLoadService">
+    <wsdl:operation name="getAllJDGDataByMapReduceKeys">
+      <wsdl:input message="tns:getAllJDGDataByMapReduceKeys" name="getAllJDGDataByMapReduceKeys"></wsdl:input>
+      <wsdl:output message="tns:getAllJDGDataByMapReduceKeysResponse" name="getAllJDGDataByMapReduceKeysResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="startCache">
+      <wsdl:input message="tns:startCache" name="startCache"></wsdl:input>
+      <wsdl:output message="tns:startCacheResponse" name="startCacheResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retrieveDGData">
+      <wsdl:input message="tns:retrieveDGData" name="retrieveDGData"></wsdl:input>
+      <wsdl:output message="tns:retrieveDGDataResponse" name="retrieveDGDataResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="searchAllJDGData">
+      <wsdl:input message="tns:searchAllJDGData" name="searchAllJDGData"></wsdl:input>
+      <wsdl:output message="tns:searchAllJDGDataResponse" name="searchAllJDGDataResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadJDGData">
+      <wsdl:input message="tns:loadJDGData" name="loadJDGData"></wsdl:input>
+      <wsdl:output message="tns:loadJDGDataResponse" name="loadJDGDataResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="RdsJDGDataLoadServiceSoapBinding" type="tns:RdsJDGDataLoadService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getAllJDGDataByMapReduceKeys">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getAllJDGDataByMapReduceKeys">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAllJDGDataByMapReduceKeysResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="startCache">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="startCache">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="startCacheResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retrieveDGData">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="retrieveDGData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="retrieveDGDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="searchAllJDGData">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="searchAllJDGData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="searchAllJDGDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadJDGData">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="loadJDGData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="loadJDGDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="RdsJDGDataLoadService">
+    <wsdl:port binding="tns:RdsJDGDataLoadServiceSoapBinding" name="RdsJDGDataLoad">
+      <soap:address location="http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://192.168.1.3:8880/rds-loader-ws/jdg/load</con:endpoint><con:endpoint>http://192.168.1.3:8880/rds-loader-ws/jdg/load</con:endpoint><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="loadJDGData" bindingOperationName="loadJDGData" type="Request-Response" outputName="loadJDGDataResponse" inputName="loadJDGData" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="RDS_SYNC_DIST_EMBEDDED"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:loadJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+      </load:loadJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/loadJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="RDS_SYNC_DIST_REMOTE"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:loadJDGData>
+         <!--Optional:-->
+         <CacheMode>REMOTE</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+      </load:loadJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/loadJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="RDS_SYNC_WRITE_THROUGH_embedded"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:loadJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+      </load:loadJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/loadJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="RDS_ASYNC_WRITE_BEHIND_embedded"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:loadJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_ASYNC_WRITE_BEHIND</CacheName>
+      </load:loadJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/loadJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-loader-ws/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:loadJDGData>
+         <!--Optional:-->
+         <CacheMode>?</CacheMode>
+         <!--Optional:-->
+         <CacheName>?</CacheName>
+      </load:loadJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/loadJDGData"/></con:call></con:operation><con:operation isOneWay="false" action="" name="retrieveDGData" bindingOperationName="retrieveDGData" type="Request-Response" outputName="retrieveDGDataResponse" inputName="retrieveDGData" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="JDG_RDS_SYNC_DIST"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:retrieveDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:retrieveDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/retrieveDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="JDG_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:retrieveDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:retrieveDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/retrieveDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="JDG_RDS_ASYNC_WRITE_BEHIND"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:retrieveDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_ASYNC_WRITE_BEHIND</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:retrieveDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/retrieveDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-loader-ws/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:retrieveDGData>
+         <!--Optional:-->
+         <CacheMode>?</CacheMode>
+         <!--Optional:-->
+         <CacheName>?</CacheName>
+         <!--Optional:-->
+         <DataFrom>?</DataFrom>
+      </load:retrieveDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/retrieveDGData"/></con:call></con:operation><con:operation isOneWay="false" action="" name="getAllJDGDataByMapReduceKeys" bindingOperationName="getAllJDGDataByMapReduceKeys" type="Request-Response" outputName="getAllJDGDataByMapReduceKeysResponse" inputName="getAllJDGDataByMapReduceKeys" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="RDS_SYNC_DIST_embedded"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:getAllJDGDataByMapReduceKeys>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+      </load:getAllJDGDataByMapReduceKeys>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/getAllJDGDataByMapReduceKeys"/><con:wsrmConfig version="1.2"/></con:call><con:call name="RDS_SYNC_WRITE_THROUGH_embedded"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:getAllJDGDataByMapReduceKeys>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+      </load:getAllJDGDataByMapReduceKeys>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/getAllJDGDataByMapReduceKeys"/><con:wsrmConfig version="1.2"/></con:call><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-loader-ws/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:getAllJDGDataByMapReduceKeys>
+         <!--Optional:-->
+         <CacheMode>?</CacheMode>
+         <!--Optional:-->
+         <CacheName>?</CacheName>
+      </load:getAllJDGDataByMapReduceKeys>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/getAllJDGDataByMapReduceKeys"/></con:call></con:operation><con:operation isOneWay="false" action="" name="searchAllJDGData" bindingOperationName="searchAllJDGData" type="Request-Response" outputName="searchAllJDGDataResponse" inputName="searchAllJDGData" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="JDG_RDS_SYNC_DIST"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:searchAllJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:searchAllJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/searchAllJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="DB_RDS_SYNC_DIST"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:searchAllJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+         <!--Optional:-->
+         <DataFrom>DB</DataFrom>
+      </load:searchAllJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/searchAllJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="JDG_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:searchAllJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:searchAllJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/searchAllJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="DB_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:searchAllJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+         <!--Optional:-->
+         <DataFrom>DB</DataFrom>
+      </load:searchAllJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/searchAllJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-loader-ws/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:searchAllJDGData>
+         <!--Optional:-->
+         <CacheMode>?</CacheMode>
+         <!--Optional:-->
+         <CacheName>?</CacheName>
+         <!--Optional:-->
+         <DataFrom>?</DataFrom>
+      </load:searchAllJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/searchAllJDGData"/></con:call></con:operation><con:operation isOneWay="false" action="" name="startCache" bindingOperationName="startCache" type="Request-Response" outputName="startCacheResponse" inputName="startCache" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="JDG_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.2:8880/jdg-mixedmode-data-loader/jdg/load</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:startCache>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+      </load:startCache>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/RdsJDGDataLoadService/startCache"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="HelloWorldServiceSoapBinding" type="wsdl" bindingName="{http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld}HelloWorldServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://10.192.170.209:8880/rds-loader-ws/jbossas?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://10.192.170.209:8880/rds-loader-ws/jbossas?wsdl"><con:part><con:url>http://10.192.170.209:8880/rds-loader-ws/jbossas?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="HelloWorldService" targetNamespace="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="sayHello" type="tns:sayHello"/>
+      <xs:element name="sayHelloResponse" type="tns:sayHelloResponse"/>
+      <xs:element name="sayHelloToName" type="tns:sayHelloToName"/>
+      <xs:element name="sayHelloToNameResponse" type="tns:sayHelloToNameResponse"/>
+      <xs:element name="sayHelloToNames" type="tns:sayHelloToNames"/>
+      <xs:element name="sayHelloToNamesResponse" type="tns:sayHelloToNamesResponse"/>
+      <xs:complexType name="sayHello">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="sayHelloResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sayHelloToNames">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sayHelloToNamesResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sayHelloToName">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sayHelloToNameResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="sayHelloToNameResponse">
+    <wsdl:part element="tns:sayHelloToNameResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHelloToNamesResponse">
+    <wsdl:part element="tns:sayHelloToNamesResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHelloToName">
+    <wsdl:part element="tns:sayHelloToName" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHelloToNames">
+    <wsdl:part element="tns:sayHelloToNames" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHelloResponse">
+    <wsdl:part element="tns:sayHelloResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHello">
+    <wsdl:part element="tns:sayHello" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="HelloWorldService">
+    <wsdl:operation name="sayHello">
+      <wsdl:input message="tns:sayHello" name="sayHello"></wsdl:input>
+      <wsdl:output message="tns:sayHelloResponse" name="sayHelloResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHelloToNames">
+      <wsdl:input message="tns:sayHelloToNames" name="sayHelloToNames"></wsdl:input>
+      <wsdl:output message="tns:sayHelloToNamesResponse" name="sayHelloToNamesResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHelloToName">
+      <wsdl:input message="tns:sayHelloToName" name="sayHelloToName"></wsdl:input>
+      <wsdl:output message="tns:sayHelloToNameResponse" name="sayHelloToNameResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HelloWorldServiceSoapBinding" type="tns:HelloWorldService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sayHello">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sayHello">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sayHelloResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHelloToNames">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sayHelloToNames">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sayHelloToNamesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sayHelloToName">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sayHelloToName">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sayHelloToNameResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HelloWorldService">
+    <wsdl:port binding="tns:HelloWorldServiceSoapBinding" name="HelloWorld">
+      <soap:address location="http://10.192.170.209:8880/rds-loader-ws/jbossas"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://10.192.170.209:8880/rds-loader-ws/jbossas</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="sayHello" bindingOperationName="sayHello" type="Request-Response" outputName="sayHelloResponse" inputName="sayHello" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://10.192.170.209:8880/rds-loader-ws/jbossas</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hel="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hel:sayHello/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld/HelloWorldService/sayHello"/></con:call></con:operation><con:operation isOneWay="false" action="" name="sayHelloToName" bindingOperationName="sayHelloToName" type="Request-Response" outputName="sayHelloToNameResponse" inputName="sayHelloToName" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://10.192.170.209:8880/rds-loader-ws/jbossas</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hel="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hel:sayHelloToName>
+         <!--Optional:-->
+         <arg0>?</arg0>
+      </hel:sayHelloToName>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld/HelloWorldService/sayHelloToName"/></con:call></con:operation><con:operation isOneWay="false" action="" name="sayHelloToNames" bindingOperationName="sayHelloToNames" type="Request-Response" outputName="sayHelloToNamesResponse" inputName="sayHelloToNames" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://10.192.170.209:8880/rds-loader-ws/jbossas</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hel="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hel:sayHelloToNames>
+         <!--Zero or more repetitions:-->
+         <arg0>?</arg0>
+      </hel:sayHelloToNames>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld/HelloWorldService/sayHelloToNames"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="RdsJDGDataLoadServiceZeroCapacitySoapBinding" type="wsdl" bindingName="{http://www.askitis.com/jdg/load/capacityzero}RdsJDGDataLoadServiceZeroCapacitySoapBinding" soapVersion="1_1" anonymous="optional" definition="http://192.168.1.3:8980/rds-ws-capacity-zero/jdg/load/capacityzero?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://192.168.1.3:8980/rds-ws-capacity-zero/jdg/load/capacityzero?wsdl"><con:part><con:url>http://192.168.1.3:8980/rds-ws-capacity-zero/jdg/load/capacityzero?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="RdsJDGDataLoadServiceZeroCapacity" targetNamespace="http://www.askitis.com/jdg/load/capacityzero" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.askitis.com/jdg/load/capacityzero" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://www.askitis.com/jdg/load/capacityzero" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="addJDGEntry" type="tns:addJDGEntry"/>
+      <xs:element name="addJDGEntryResponse" type="tns:addJDGEntryResponse"/>
+      <xs:element name="getAllJDGDataByMapReduceKeys" type="tns:getAllJDGDataByMapReduceKeys"/>
+      <xs:element name="getAllJDGDataByMapReduceKeysResponse" type="tns:getAllJDGDataByMapReduceKeysResponse"/>
+      <xs:element name="loadJDGData" type="tns:loadJDGData"/>
+      <xs:element name="loadJDGDataResponse" type="tns:loadJDGDataResponse"/>
+      <xs:element name="retrieveDGData" type="tns:retrieveDGData"/>
+      <xs:element name="retrieveDGDataResponse" type="tns:retrieveDGDataResponse"/>
+      <xs:element name="searchAllJDGData" type="tns:searchAllJDGData"/>
+      <xs:element name="searchAllJDGDataResponse" type="tns:searchAllJDGDataResponse"/>
+      <xs:element name="startCache" type="tns:startCache"/>
+      <xs:element name="startCacheResponse" type="tns:startCacheResponse"/>
+      <xs:complexType name="searchAllJDGData">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+          <xs:element minOccurs="0" name="DataFrom" type="tns:dataLocation"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="searchAllJDGDataResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="CacheRetrieveResult" type="tns:derivativeProduct"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="derivativeProduct">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="balmoproductcode" type="tns:balmoProductCode"/>
+          <xs:element minOccurs="0" name="formulaline" type="tns:formulaLine"/>
+          <xs:element minOccurs="0" name="formulaprice" type="tns:formulaPrice"/>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="type" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="balmoProductCode">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="type" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="formulaLine">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="type" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="formulaPrice">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="price" type="xs:integer"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="startCache">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="startCacheResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheStartResult" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="retrieveDGData">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+          <xs:element minOccurs="0" name="DataFrom" type="tns:dataLocation"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="retrieveDGDataResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheRetrieveResult" type="tns:derivativesDTO"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="derivativesDTO">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="addJDGEntry">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="addJDGEntryResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheLoadResult" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="loadJDGData">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="loadJDGDataResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheLoadResult" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getAllJDGDataByMapReduceKeys">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CacheMode" type="tns:mode"/>
+          <xs:element minOccurs="0" name="CacheName" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getAllJDGDataByMapReduceKeysResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="CacheRetrieveResult" type="tns:derivativeProduct"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="mode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="REMOTE"/>
+          <xs:enumeration value="EMBEDDED"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="dataLocation">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="JDG"/>
+          <xs:enumeration value="DB"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="retrieveDGDataResponse">
+    <wsdl:part element="tns:retrieveDGDataResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="retrieveDGData">
+    <wsdl:part element="tns:retrieveDGData" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAllJDGDataByMapReduceKeys">
+    <wsdl:part element="tns:getAllJDGDataByMapReduceKeys" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="addJDGEntry">
+    <wsdl:part element="tns:addJDGEntry" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="loadJDGData">
+    <wsdl:part element="tns:loadJDGData" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="startCache">
+    <wsdl:part element="tns:startCache" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="searchAllJDGData">
+    <wsdl:part element="tns:searchAllJDGData" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="addJDGEntryResponse">
+    <wsdl:part element="tns:addJDGEntryResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="loadJDGDataResponse">
+    <wsdl:part element="tns:loadJDGDataResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAllJDGDataByMapReduceKeysResponse">
+    <wsdl:part element="tns:getAllJDGDataByMapReduceKeysResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="startCacheResponse">
+    <wsdl:part element="tns:startCacheResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="searchAllJDGDataResponse">
+    <wsdl:part element="tns:searchAllJDGDataResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="RdsJDGDataLoadServiceZeroCapacity">
+    <wsdl:operation name="searchAllJDGData">
+      <wsdl:input message="tns:searchAllJDGData" name="searchAllJDGData"></wsdl:input>
+      <wsdl:output message="tns:searchAllJDGDataResponse" name="searchAllJDGDataResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="startCache">
+      <wsdl:input message="tns:startCache" name="startCache"></wsdl:input>
+      <wsdl:output message="tns:startCacheResponse" name="startCacheResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retrieveDGData">
+      <wsdl:input message="tns:retrieveDGData" name="retrieveDGData"></wsdl:input>
+      <wsdl:output message="tns:retrieveDGDataResponse" name="retrieveDGDataResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addJDGEntry">
+      <wsdl:input message="tns:addJDGEntry" name="addJDGEntry"></wsdl:input>
+      <wsdl:output message="tns:addJDGEntryResponse" name="addJDGEntryResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadJDGData">
+      <wsdl:input message="tns:loadJDGData" name="loadJDGData"></wsdl:input>
+      <wsdl:output message="tns:loadJDGDataResponse" name="loadJDGDataResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAllJDGDataByMapReduceKeys">
+      <wsdl:input message="tns:getAllJDGDataByMapReduceKeys" name="getAllJDGDataByMapReduceKeys"></wsdl:input>
+      <wsdl:output message="tns:getAllJDGDataByMapReduceKeysResponse" name="getAllJDGDataByMapReduceKeysResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="RdsJDGDataLoadServiceZeroCapacitySoapBinding" type="tns:RdsJDGDataLoadServiceZeroCapacity">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="searchAllJDGData">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="searchAllJDGData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="searchAllJDGDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addJDGEntry">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="addJDGEntry">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="addJDGEntryResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retrieveDGData">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="retrieveDGData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="retrieveDGDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="startCache">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="startCache">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="startCacheResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAllJDGDataByMapReduceKeys">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getAllJDGDataByMapReduceKeys">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAllJDGDataByMapReduceKeysResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadJDGData">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="loadJDGData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="loadJDGDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="RdsJDGDataLoadServiceZeroCapacity">
+    <wsdl:port binding="tns:RdsJDGDataLoadServiceZeroCapacitySoapBinding" name="RdsJDGDataLoadCapacityZero">
+      <soap:address location="http://192.168.1.3:8980/rds-ws-capacity-zero/jdg/load/capacityzero"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:endpoint>http://192.168.1.6:8980/rds-loader-ws/jdg/load/capacityzero</con:endpoint><con:endpoint>http://192.168.1.6:8980/rds-loader-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:endpoint>http://192.168.1.3:8980/rds-loader-ws-capacity-zero/jdg/load/capacityzero</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="retrieveDGData" bindingOperationName="retrieveDGData" type="Request-Response" outputName="retrieveDGDataResponse" inputName="retrieveDGData" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="0_JDG_RDS_ASYNC_WRITE_BEHIND"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:retrieveDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_ASYNC_WRITE_BEHIND</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:retrieveDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/retrieveDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="0_JDG_RDS_SYNC_DIST"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:retrieveDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:retrieveDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/retrieveDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="0_JDG_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:retrieveDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:retrieveDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/retrieveDGData"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="" name="searchAllJDGData" bindingOperationName="searchAllJDGData" type="Request-Response" outputName="searchAllJDGDataResponse" inputName="searchAllJDGData" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="0_JDG_RDS_SYNC_DIST"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:searchAllJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:searchAllJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/searchAllJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="0_JDG_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:load="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <load:searchAllJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+         <!--Optional:-->
+         <DataFrom>JDG</DataFrom>
+      </load:searchAllJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/searchAllJDGData"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="" name="addJDGEntry" bindingOperationName="addJDGEntry" type="Request-Response" outputName="addJDGEntryResponse" inputName="addJDGEntry" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="0_RDS_SYNC_DIST"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cap="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cap:addJDGEntry>
+          <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+         <!--Optional:-->
+      </cap:addJDGEntry>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/addJDGEntry"/><con:wsrmConfig version="1.2"/></con:call><con:call name="0_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cap="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cap:addJDGEntry>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+      </cap:addJDGEntry>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/addJDGEntry"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="" name="getAllJDGDataByMapReduceKeys" bindingOperationName="getAllJDGDataByMapReduceKeys" type="Request-Response" outputName="getAllJDGDataByMapReduceKeysResponse" inputName="getAllJDGDataByMapReduceKeys" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="0_JDG_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cap="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cap:getAllJDGDataByMapReduceKeys>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+      </cap:getAllJDGDataByMapReduceKeys>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/getAllJDGDataByMapReduceKeys"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="" name="loadJDGData" bindingOperationName="loadJDGData" type="Request-Response" outputName="loadJDGDataResponse" inputName="loadJDGData" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="0_R_DS_ASYNC_WRITE_BEHIND_embedded"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cap="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cap:loadJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_ASYNC_WRITE_BEHIND</CacheName>
+      </cap:loadJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/loadJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="0_RDS_SYNC_DIST_EMBEDDED"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cap="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cap:loadJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_DIST</CacheName>
+      </cap:loadJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/loadJDGData"/><con:wsrmConfig version="1.2"/></con:call><con:call name="0_RDS_SYNC_WRITE_THROUGH_embedded"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cap="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cap:loadJDGData>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+      </cap:loadJDGData>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/loadJDGData"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="" name="startCache" bindingOperationName="startCache" type="Request-Response" outputName="startCacheResponse" inputName="startCache" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="JDG_RDS_SYNC_WRITE_THROUGH"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://192.168.1.3:8880/rds-ws-capacity-zero/jdg/load/capacityzero</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cap="http://www.askitis.com/jdg/load/capacityzero">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cap:startCache>
+         <!--Optional:-->
+         <CacheMode>EMBEDDED</CacheMode>
+         <!--Optional:-->
+         <CacheName>RDS_SYNC_WRITE_THROUGH</CacheName>
+      </cap:startCache>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.askitis.com/jdg/load/capacityzero/RdsJDGDataLoadServiceZeroCapacity/startCache"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:sensitiveInformation/></con:soapui-project>

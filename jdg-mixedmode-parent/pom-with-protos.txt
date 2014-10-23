@@ -1,0 +1,73 @@
+        <resources>
+            <resource>
+                <directory>src/main/resources/protos</directory>
+                <excludes>
+                    <exclude>**/*.proto</exclude>
+                </excludes>
+            </resource>
+
+            <resource>
+                <directory>${project.build.directory}/protobuf-descriptors</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+        			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.war.plugin}</version>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+			<!-- JBoss AS plugin to deploy war -->
+			<plugin>
+				<groupId>org.jboss.as.plugins</groupId>
+				<artifactId>jboss-as-maven-plugin</artifactId>
+				<version>${version.jboss.maven.plugin}</version>
+			</plugin>
+            <!--
+                Execute protoc tool to parse our proto definitions and generate the serialized descriptor set (protobin).
+                You must have the protoc tool installed.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${ant.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile-protoc</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}/protobuf-descriptors/protos"/>
+                                <exec executable="protoc" failonerror="true">
+                                    <arg value="--proto_path=${project.basedir}/src/main/resources/protos"/>			
+                                    <arg value="--descriptor_set_out=${project.build.directory}/protobuf-descriptors/protos/derivatives.protobin"/>
+                                    <arg value="${project.basedir}/src/main/resources/protos/derivatives.proto"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- This plugin permits the execution of this quickstart through mvn exec:java command >
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>${main.class.remote-query}</mainClass>
+                </configuration>
+            </plugin-->
+        </plugins>

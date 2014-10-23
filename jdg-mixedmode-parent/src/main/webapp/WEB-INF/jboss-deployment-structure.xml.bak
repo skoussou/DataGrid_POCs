@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+	<deployment>
+		<exclusions>
+			<module name="org.jgroups" />
+
+		</exclusions>
+		<dependencies>
+			<module name="org.jgroups" slot="jdg-6.3" services="export"/>
+			<module name="org.jboss.as.clustering.jgroups" services="export"/>
+			<!-- Purely for retrieving cache data which are entities -->
+			<module name="org.hibernate"/>
+
+			<!-- module name="org.infinispan" slot="jdg-6.3" services="export" /> 
+				<module name="org.infinispan.commons" slot="jdg-6.3" services="export" /> 
+				<module name="org.infinispan.query" slot="jdg-6.3" services="export" /> <module 
+				name="org.infinispan.persistence.jdbc" slot="jdg-6.3" services="export" /> 
+				<module name="org.infinispan.cdi" slot="jdg-6.3" services="export" / -->
+		</dependencies>
+	</deployment>
+</jboss-deployment-structure>

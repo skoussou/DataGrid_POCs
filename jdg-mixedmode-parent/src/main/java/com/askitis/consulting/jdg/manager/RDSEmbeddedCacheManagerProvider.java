@@ -1,0 +1,659 @@
+package com.askitis.consulting.jdg.manager;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.annotation.ElementType;
+import java.text.MessageFormat;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.hibernate.search.cfg.SearchMapping;
+import org.infinispan.Cache;
+import org.infinispan.commons.CacheException;
+import org.infinispan.configuration.cache.CacheMode;
+import org.infinispan.configuration.cache.Configuration;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.global.GlobalConfigurationBuilder;
+import org.infinispan.configuration.global.TransportConfigurationBuilder;
+import org.infinispan.eviction.EvictionStrategy;
+import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.persistence.jdbc.configuration.JdbcMixedStoreConfigurationBuilder;
+import org.infinispan.persistence.jdbc.configuration.JdbcStringBasedStoreConfigurationBuilder;
+import org.infinispan.remoting.transport.Transport;
+import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
+import org.infinispan.transaction.LockingMode;
+import org.infinispan.transaction.TransactionMode;
+import org.infinispan.transaction.TransactionProtocol;
+import org.infinispan.util.concurrent.IsolationLevel;
+
+import com.askitis.consulting.jdg.jgroups.*;
+import com.askitis.consulting.jdg.jgroups.HybridCluster.MuxChannelLookup;
+
+import org.jboss.marshalling.ModularClassResolver;
+import org.jboss.modules.Module;
+import org.jboss.modules.ModuleClassLoader;
+import org.jboss.modules.ModuleLoader;
+import org.jgroups.conf.ConfiguratorFactory;
+import org.jgroups.conf.ProtocolStackConfigurator;
+
+import com.askitis.consulting.rds.model.DerivativeProduct;
+
+/**
+ * RDS Embedded Manager (Capacity-FACTOR=0)
+ * @author skoussou
+ *
+ */
+@ApplicationScoped
+public class RDSEmbeddedCacheManagerProvider implements CacheManagerProvider<Cache>{
+
+	private static String LOG_PREFIX = "[RDS POC] ";
+	
+    @Inject
+    private Logger log;
+    
+	private EmbeddedCacheManager cacheManager;
+
+	@PostConstruct
+	public void init() throws CacheException {
+		if (cacheManager == null) {
+			log.info("=== Starting EmbeddedCacheManager ...");
+			try {
+//				cacheManager = createCacheManagerFromXml();
+//				cacheManager = createCacheManagerProgramatically();
+				if (System.getProperty("CONFIGURATION") != null && System.getProperty("CONFIGURATION").equalsIgnoreCase("MUXCHANNEL")){
+					log.info(LOG_PREFIX+"***> [USING "+System.getProperty("CONFIGURATION")+" CacheManager Configuration");
+					cacheManager = createCacheManagerProgrammaticallyMuxChannelJGroupsTransport();
+				}
+				if (System.getProperty("CONFIGURATION") != null && System.getProperty("CONFIGURATION").equalsIgnoreCase("MultipleCaches")) {
+					log.info(LOG_PREFIX+"***> [USING MultipleCaches CacheManager Configuration");					
+					cacheManager = createCacheManagerProgramaticallyMultipleCaches();
+				}
+				if (System.getProperty("CONFIGURATION") != null && System.getProperty("CONFIGURATION").equalsIgnoreCase("MixedMode")) {
+					log.info(LOG_PREFIX+"***> [USING MixedMode CacheManager Configuration");					
+					cacheManager = createCacheManagerProgrammaticallyMixedMode();
+				}
+			} catch (Exception e) {
+				throw new CacheException("Failed to start Cache from file", e);
+			}
+//			log.info("=== EmbeddedCacheManager Started [Cache Manager Details Follow]\n"
+//					+ "Cluster Name: "+ cacheManager.getClusterName()
+//					+ "\nCluster Coordinator: "+cacheManager.getCoordinator()
+//					+ "\n Cluster Members"+cacheManager.getMembers()
+//					+ "\n Cache Names: "+ cacheManager.getCacheNames()
+//					+ "\n ===================== CacheManager (Global) Configuration ==================="
+//					+ "\n "+cacheManager.getCacheManagerConfiguration()
+//			        + "\n "+printIndividualCacheConfig(cacheManager));
+			
+		}
+	}
+
+	private String printIndividualCacheConfig(EmbeddedCacheManager cacheManager) {
+		StringBuffer report = new StringBuffer();
+		for (String name : cacheManager.getCacheNames()) {
+			report.append("\n ===================== Cache "+name+" Configuration ===================");
+			report.append("\n "+cacheManager.getCacheConfiguration(name));
+			report.append("\n ===================== END Cache Configs ===================");
+       }
+		return report.toString();
+	}
+
+	public Cache getCache(String cacheName) {
+		if (cacheManager == null) {
+			init();
+		}
+		if (cacheName == null || cacheName.equals("")) {
+			return cacheManager.getCache();
+		}
+		return cacheManager.getCache(cacheName);
+	}
+
+	
+	public EmbeddedCacheManager getEmbeddedCacheContainer() throws CacheException {
+
+		if (cacheManager == null) {
+			try {
+				init();
+			} catch (Exception e) {
+				log.info(e.getMessage());
+				throw new CacheException("Failed to start Cache", e);
+			}
+		}
+		return cacheManager;
+	}
+	
+	private EmbeddedCacheManager createCacheManagerProgramatically() {
+		
+		return new DefaultCacheManager(
+				// GLOBAL CONFIGURATION
+				new GlobalConfigurationBuilder().clusteredDefault()	// Configure clustered default cache
+				.globalJmxStatistics().cacheManagerName("UDMCacheManager").allowDuplicateDomains(true).enable() // Provide a name for the CacheManager MBean JMX Statistics (all caches emmit stas unless disabled per cache)
+				.transport().clusterName("UDM-CLUSTER").addProperty("configurationFile", "jgroups-tcp2.xml")    // Transport defined by JGROUPS xml configuration over TCP, cluster name UDM-CLUSTER
+				.build(),
+				// DEFAULT CLUSTERED CONFIGURATION
+				new ConfigurationBuilder()
+				.jmxStatistics().enable()
+				.clustering().cacheMode(CacheMode.REPL_SYNC).stateTransfer().fetchInMemoryState(true).awaitInitialTransfer(true) // CLUSTERED CACHE, REPLICATED SYNCHRONOYSLY, StateTransfer or the cache and fetch in memory state from neighborouring caches to warm up the cache
+				.indexing().enable().indexLocalOnly(false)//.withProperties(createIndexingProps())  // Indexing Enabled
+				        .addProperty("hibernate.search.default.directory_provider", "ram") //other options "filesystem" or "infinispan" (in the grid)
+				        .addProperty("lucene_version", "LUCENE_CURRENT")
+//				        .addProperty("hibernate.search.default.directory_provider", "infinispan")
+//				        .addProperty("hibernate.search.default.indexmanager", "org.infinispan.query.indexmanager.InfinispanIndexManager")
+//				        .addProperty("hibernate.search.default.exclusive_index_use", "false")     
+				        // more lucene properties eg. hibernate.search.lucene_version etc. can be added
+				        // alternative .withProperties(createIndexingProps())
+				.locking().isolationLevel(IsolationLevel.REPEATABLE_READ)
+				.eviction().maxEntries(-1) // EVICTION disabled to keep all entries both in memory and in cachestore in order to reload the cache at restart		
+				.expiration().disableReaper().lifespan(-1).maxIdle(-1).wakeUpInterval(-1) // Disable background reaper and set idle time to infinite, no expiration
+				
+				// LevelDB CacheStore - Note the file location must never be deleted
+				//.persistence().passivation(false).addStore(LevelDBStoreConfigurationBuilder.class).location("/tmp/leveldb-mc2/data").expiredLocation("/tmp/leveldb-mc2/expired").async().shared(false).purgeOnStartup(false).fetchPersistentState(true).ignoreModifications(false).preload(true)//.threadPoolSize(i).shutdownTimeout(l).modificationQueueSize(i).flushLockTimeout(l)
+                // SingleFileStore CacheStore
+				//.persistence().passivation(false).addSingleFileStore().location("/tmp/jdgcachestore-mc2").async().shared(false).purgeOnStartup(false).fetchPersistentState(true).ignoreModifications(false).preload(true)//.threadPoolSize(i).shutdownTimeout(l).modificationQueueSize(i).flushLockTimeout(l)
+				
+				.invocationBatching().enable() // Possible needed for writing multiple entries into cache
+				.build()
+				,true);
+	}
+	
+	private EmbeddedCacheManager createCacheManagerProgramaticallyMultipleCaches() {
+		log.info(LOG_PREFIX+"Creating cacheManager with createCacheManagerProgramaticallyMultipleCaches()");
+		DefaultCacheManager manager = new DefaultCacheManager(
+				// GLOBAL CONFIGURATION
+				new GlobalConfigurationBuilder().clusteredDefault()	// Configure clustered default cache
+				.globalJmxStatistics().cacheManagerName("RDSCacheManagerCapacityZero").allowDuplicateDomains(true).enable() // Provide a name for the CacheManager MBean JMX Statistics (all caches emmit stas unless disabled per cache)
+				.transport().addProperty("configurationFile", "jgroups-udp.xml").clusterName("RDS-DATAGRID-CLUSTER").nodeName("RDS-EAP-CAPACITY-ZERO")    // Transport defined by JGROUPS xml configuration over UDP, cluster name RDS-DATAGRID-CLUSTER
+				.build());
+		
+		manager.defineConfiguration("default", createDefaultCacheConfiguration());
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_SYNC_DIST.name(), "default", createRDS_SYNC_DIST_Configuration());
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_ASYNC_DIST.name(), "default", createRDS_ASYNC_DIST_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_SYNC_WRITE_THROUGH.name(), "default", createRDS_SYNC_WRITE_THROUGH_DIST_Configuration());
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_ASYNC_WRITE_BEHIND.name(), "default", createRDS_ASYNC_WRITE_BEHIND_DIST_Configuration());
+		
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_metadata_repl.name(), "default", create_lucene_metadata_repl_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_data_dist.name(), "default", create_lucene_data_dist_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_locking_repl.name(), "default", create_lucene_locking_repl_Configuration());
+
+//		Cache cache_metadata = manager.getCache(CacheManagerProvider.CACHE_NAMES.lucene_metadata_repl.name());
+//		Cache cache_data = manager.getCache(CacheManagerProvider.CACHE_NAMES.lucene_data_dist.name());
+//		Cache cache_locks = manager.getCache(CacheManagerProvider.CACHE_NAMES.lucene_locking_repl.name());
+//		Directory indexDir = DirectoryBuilder.newDirectoryInstance(cache_metadata, cache_data, cache_locks, 
+//				"default").create();
+		
+		return manager;
+	}
+
+	private EmbeddedCacheManager createCacheManagerProgrammaticallyMixedMode() {
+		HybridCluster cluster = new HybridCluster();
+		DefaultCacheManager manager = (DefaultCacheManager) cluster.getCacheManager();
+
+		manager.defineConfiguration("default", createDefaultCacheConfiguration());
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_SYNC_DIST.name(), "default", createRDS_SYNC_DIST_Configuration());
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_ASYNC_DIST.name(), "default", createRDS_ASYNC_DIST_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_SYNC_WRITE_THROUGH.name(), "default", createRDS_SYNC_WRITE_THROUGH_DIST_Configuration());
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_ASYNC_WRITE_BEHIND.name(), "default", createRDS_ASYNC_WRITE_BEHIND_DIST_Configuration());
+
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_metadata_repl.name(), "default", create_lucene_metadata_repl_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_data_dist.name(), "default", create_lucene_data_dist_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_locking_repl.name(), "default", create_lucene_locking_repl_Configuration());
+
+
+//		Cache cache_metadata = manager.getCache(CacheManagerProvider.CACHE_NAMES.lucene_metadata_repl.name());
+//		Cache cache_data = manager.getCache(CacheManagerProvider.CACHE_NAMES.lucene_data_dist.name());
+//		Cache cache_locks = manager.getCache(CacheManagerProvider.CACHE_NAMES.lucene_locking_repl.name());
+//		Directory indexDir = DirectoryBuilder.newDirectoryInstance(cache_metadata, cache_data, cache_locks, 
+//				"default").create();
+		
+		Transport transport = manager.getCache(CacheManagerProvider.CACHE_NAMES.RDS_SYNC_WRITE_THROUGH.name()).getAdvancedCache().getRpcManager().getTransport();
+//		log.info(MessageFormat.format("Node %s joined as master["+CacheManagerProvider.CACHE_NAMES.RDS_SYNC_WRITE_THROUGH.name()+"]. View is %s.%n", transport.getAddress(), transport.getMembers()));
+		return manager;
+	}
+	
+	private EmbeddedCacheManager createCacheManagerProgrammaticallyMuxChannelJGroupsTransport() {
+			
+		org.infinispan.remoting.transport.Transport muxTransport = null;
+		try {
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("jgroups-udp.xml");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream ));
+			
+			ProtocolStackConfigurator configurator = ConfiguratorFactory.getStackConfigurator(inputStream);
+			MuxChannel channel = new MuxChannel(configurator);
+			muxTransport = new org.infinispan.remoting.transport.jgroups.JGroupsTransport(channel);
+		} catch (Exception e1) {
+			log.info("ERROR - creating MUXChannel");
+		}
+		
+		DefaultCacheManager manager = new DefaultCacheManager(
+				// GLOBAL CONFIGURATION
+				new GlobalConfigurationBuilder().clusteredDefault().transport().transport(muxTransport).clusterName("RDS-DATAGRID-CLUSTER").nodeName("RDS-JDG-Loader")
+				.globalJmxStatistics().cacheManagerName("RDSLoader_CacheManager").allowDuplicateDomains(true).enable()
+                .serialization().classResolver(HybridClassResolverOld.getInstance(HybridCluster.class.getClassLoader()))				
+				.build());
+		
+		// creating configuration programmatically same as  (same as rds-jdg-cache-config.xml) to avoid possible AS Clustering/JDG Library mode issue (custom MUXChannel above)
+		manager.defineConfiguration("default", createDefaultCacheConfiguration());
+				
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_SYNC_DIST.name(), "default", createRDS_SYNC_DIST_Configuration());
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_ASYNC_DIST.name(), "default", createRDS_ASYNC_DIST_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_SYNC_WRITE_THROUGH.name(), "default", createRDS_SYNC_WRITE_THROUGH_DIST_Configuration());
+//		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.RDS_ASYNC_WRITE_BEHIND.name(), "default", createRDS_ASYNC_WRITE_BEHIND_DIST_Configuration());
+			
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_metadata_repl.name(), "default", create_lucene_metadata_repl_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_data_dist.name(), "default", create_lucene_data_dist_Configuration());
+		manager.defineConfiguration(CacheManagerProvider.CACHE_NAMES.lucene_locking_repl.name(), "default", create_lucene_locking_repl_Configuration());
+
+		return manager;
+	}
+
+	private Configuration createRDS_SYNC_DIST_Configuration() {
+		log.info(LOG_PREFIX+"Creating cache with createRDS_SYNC_DIST_Configuration()");
+		return new ConfigurationBuilder().jmxStatistics()
+				// indexing
+				// 430ms without indexing
+				// 8346 with RAM indexing w/out near-real-time, 562-1382 with near-real-time, 188-1163 with async, 
+				// 2449524 very long with Filesystem indexing w/out near-real-time, 1063 with near-real-time, 221-1015 with async, 628-1615 with sync
+				// 23718 with Infinispan Cache indexing, with async & near-real-time dropping a lot msecs
+				.indexing().enable().indexLocalOnly(true)//.withProperties(createIndexingProps())  // Indexing Enabled
+				        .addProperty("lucene_version", "LUCENE_CURRENT")
+//				        .addProperty("default.indexmanager", "near-real-time")
+				        // Takes longer than near-real-time by 20+ secs can we utilize near-real-time for infinispan directory?
+				        .addProperty("default.indexmanager", "org.infinispan.query.indexmanager.InfinispanIndexManager")
+				        // Fast 200+ msecs
+				        .addProperty("default.worker.execution", "async")
+//				        .addProperty("worker.thread_pool.size", "100")
+				        
+				        /*
+				         * 3.7.1.1. Control segment size
+				         *  The options merge_max_size, merge_max_optimize_size, merge_calibrate_by_deletes give you control on the maximum size 
+				         *  of the segments being created, but you need to understand how they affect file sizes. If you need to hard limit the 
+				         *  size, consider that merging a segment is about adding it together with another existing segment to form a larger one, 
+				         *  so you might want to set the max_size for merge operations to less than half of your hard limit. Also segments might 
+				         *  initially be generated larger than your expected size at first creation time: before they are ever merged. A segment 
+				         *  is never created much larger than ram_buffer_size, but the threshold is checked as an estimate.
+				         *  Example:
+				         *  //to be fairly confident no files grow above 15MB, use:
+				         *  hibernate.search.default.indexwriter.ram_buffer_size = 10
+				         *  hibernate.search.default.indexwriter.merge_max_optimize_size = 7
+				         *  hibernate.search.default.indexwriter.merge_max_size = 7
+				         *  Tip
+				         *  When using the Infinispan Directory to cluster indexes make sure that your segments are smaller than the chunk_size so 
+				         *  that you avoid fragmenting segments in the grid. Note that the chunk_size of the Infinispan Directory is expressed in 
+				         *  bytes, while the index tuning options are in MB.
+				         */
+				        
+				        .addProperty("default.directory_provider", "infinispan")
+				        .addProperty("default.exclusive_index_use", "false")
+				        .addProperty("default.metadata_cachename", "lucene_metadata_repl")
+				        .addProperty("default.data_cachename", "lucene_data_dist")
+				        .addProperty("default.locking_cachename", "lucene_locking_repl")
+				        // RAM INDEXING
+//				        .addProperty("hibernate.search.default.directory_provider", "ram") //other options "filesystem" or "infinispan" (in the grid)	
+				        // FILE INDEXING				        
+//						.addProperty("default.directory_provider", "filesystem")
+//						.addProperty("default.indexBase", "/tmp/JDG_INDEX")
+		        // more lucene properties eg. hibernate.search.lucene_version etc. can be added.build(true));
+				// http://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/
+				        
+		        // locking
+				.locking().isolationLevel(IsolationLevel.REPEATABLE_READ).concurrencyLevel(32).lockAcquisitionTimeout(10000).useLockStriping(false).writeSkewCheck(false).supportsConcurrentUpdates(true)
+		        // eviction 
+				// Disabled, All entries wil be both in memory and in cachestore (write through/behind) in order to reload the cache at restart
+				.eviction().maxEntries(-1)
+				// expiration
+				// Disable background reaper and set idle time to infinite, no expiration
+				.expiration().disableReaper().lifespan(-1).maxIdle(-1).wakeUpInterval(-1) 
+				// transactions
+				.transaction().cacheStopTimeout(30000).completedTxTimeout(150000).reaperWakeUpInterval(1000).eagerLockingSingleNode(false)
+				.syncCommitPhase(true).syncRollbackPhase(false).useEagerLocking(false).useSynchronization(false).lockingMode(LockingMode.PESSIMISTIC)
+				.transactionMode(TransactionMode.TRANSACTIONAL).autoCommit(true).use1PcForAutoCommitTransactions(false).transactionProtocol(TransactionProtocol.DEFAULT)
+				.recovery().enabled(false)
+				// batching
+				.invocationBatching().enable() // Possible needed for writing multiple entries into cache
+				
+		.clustering().cacheMode(CacheMode.DIST_SYNC)
+		 .hash().capacityFactor(0f)// TODO - NOTE THIS IS SET TO CAPACITY-FACTOR=0 NO DATA WILL BE KEPT HERE
+		.sync()
+		.stateTransfer().awaitInitialTransfer(true).fetchInMemoryState(true)
+		.compatibility().enabled(true).build();
+	}
+	
+	private Configuration createRDS_ASYNC_DIST_Configuration() {
+		log.info(LOG_PREFIX+"cache RDS_ASYNC_DIST Configured");
+		return new ConfigurationBuilder().jmxStatistics()
+				// indexing
+				.indexing().enable().indexLocalOnly(true)//.withProperties(createIndexingProps())  // Indexing Enabled
+//				        .addProperty("hibernate.search.default.directory_provider", "ram") //other options "filesystem" or "infinispan" (in the grid)
+				        .addProperty("lucene_version", "LUCENE_CURRENT")
+				        .addProperty("default.directory_provider", "infinispan")
+//				        .addProperty("default.indexmanager", "near-real-time")
+				        // Takes longer than near-real-time by 20+ secs can we utilize near-real-time for infinispan directory?
+				         .addProperty("default.indexmanager", "org.infinispan.query.indexmanager.InfinispanIndexManager")
+				        .addProperty("default.exclusive_index_use", "false")
+				        .addProperty("default.metadata_cachename", "lucene_metadata_repl")
+				        .addProperty("default.data_cachename", "lucene_data_dist")
+				        .addProperty("default.locking_cachename", "lucene_locking_repl")
+//								        .addProperty("default.directory_provider", "filesystem")
+//								        .addProperty("default.indexBase", "/tmp/JDG_INDEX")
+		        // more lucene properties eg. hibernate.search.lucene_version etc. can be added.build(true));
+		        // locking
+				.locking().isolationLevel(IsolationLevel.REPEATABLE_READ).concurrencyLevel(32).lockAcquisitionTimeout(10000).useLockStriping(false).writeSkewCheck(false).supportsConcurrentUpdates(true)
+		        // eviction 
+				// Disabled, All entries wil be both in memory and in cachestore (write through/behind) in order to reload the cache at restart
+				.eviction().maxEntries(-1)
+				// expiration
+				// Disable background reaper and set idle time to infinite, no expiration
+				.expiration().disableReaper().lifespan(-1).maxIdle(-1).wakeUpInterval(-1) 
+				// transactions
+				.transaction().cacheStopTimeout(30000).completedTxTimeout(150000).reaperWakeUpInterval(1000).eagerLockingSingleNode(false)
+				.syncCommitPhase(true).syncRollbackPhase(false).useEagerLocking(false).useSynchronization(false).lockingMode(LockingMode.PESSIMISTIC)
+				.transactionMode(TransactionMode.TRANSACTIONAL).autoCommit(true).use1PcForAutoCommitTransactions(false).transactionProtocol(TransactionProtocol.DEFAULT)
+				.recovery().enabled(false) //Not possible for ASYNC
+				// batching
+				.invocationBatching().enable() // Possible needed for writing multiple entries into cache
+				
+		.clustering().cacheMode(CacheMode.DIST_ASYNC)
+		 .hash().capacityFactor(0f)// TODO - NOTE THIS IS SET TO CAPACITY-FACTOR=0 NO DATA WILL BE KEPT HERE
+		.async()
+		.stateTransfer().awaitInitialTransfer(true).fetchInMemoryState(true)
+		.compatibility().enabled(true).build();
+	}
+	
+	private Configuration createRDS_SYNC_WRITE_THROUGH_DIST_Configuration() {
+		log.info(LOG_PREFIX+"RDS_SYNC_WRITE_THROUGH_DIST Configured)");
+		return new ConfigurationBuilder().jmxStatistics()
+				// indexing
+				.indexing().enable().indexLocalOnly(true)//.withProperties(createIndexingProps())  // Indexing Enabled
+				        .addProperty("lucene_version", "LUCENE_CURRENT")
+				        // Shared across cluster Index (Single IndexManager)		        
+				        .addProperty("default.directory_provider", "infinispan")
+				        .addProperty("hibernate.search.default.indexmanager", "org.infinispan.query.indexmanager.InfinispanIndexManager")
+				        .addProperty("hibernate.search.default.worker.backend", "jgroups")
+				        .addProperty("hibernate.search.services.jgroups.configurationFile", "jgroups-udp.xml")
+				        .addProperty("hibernate.search.services.jgroups.clusterName", "RDS-INDEX-JGROUPS-CLUSTER")
+                        //.addProperty("hibernate.search.infinispan.cachemanager_jndiname", "??")
+				        .addProperty("default.exclusive_index_use", "false")
+				        .addProperty("default.metadata_cachename", "lucene_metadata_repl")
+				        .addProperty("default.data_cachename", "lucene_data_dist")
+				        .addProperty("default.locking_cachename", "lucene_locking_repl")
+				        //other options "filesystem" or "ram"
+//				        .addProperty("hibernate.search.default.directory_provider", "ram") 
+//				        .addProperty("default.indexmanager", "near-real-time")				        
+////					.addProperty("default.directory_provider", "filesystem")
+//						.addProperty("default.indexBase", "/tmp/JDG_INDEX")
+		        // more lucene properties eg. hibernate.search.lucene_version etc. can be added.build(true));
+		        // locking
+				.locking().isolationLevel(IsolationLevel.REPEATABLE_READ).concurrencyLevel(32).lockAcquisitionTimeout(10000).useLockStriping(false).writeSkewCheck(false).supportsConcurrentUpdates(true)
+		        // eviction 
+				// Disabled, All entries wil be both in memory and in cachestore (write through/behind) in order to reload the cache at restart
+				.eviction().maxEntries(-1)
+				// expiration
+				// Disable background reaper and set idle time to infinite, no expiration
+				.expiration().disableReaper().lifespan(-1).maxIdle(-1).wakeUpInterval(-1) 
+				// transactions
+				.transaction().cacheStopTimeout(30000).completedTxTimeout(150000).reaperWakeUpInterval(1000).eagerLockingSingleNode(false)
+				.syncCommitPhase(true).syncRollbackPhase(false).useEagerLocking(false).useSynchronization(false).lockingMode(LockingMode.PESSIMISTIC)
+				.transactionMode(TransactionMode.TRANSACTIONAL).autoCommit(true).use1PcForAutoCommitTransactions(false).transactionProtocol(TransactionProtocol.DEFAULT)
+				.recovery().enabled(false)
+				// batching
+				.invocationBatching().enable() // Possible needed for writing multiple entries into cache
+				
+        .clustering().cacheMode(CacheMode.DIST_SYNC)
+		 .hash().capacityFactor(0f)// TODO - NOTE THIS IS SET TO CAPACITY-FACTOR=0 NO DATA WILL BE KEPT HERE
+        .sync()
+        .stateTransfer().awaitInitialTransfer(true).fetchInMemoryState(true)
+        .compatibility().enabled(true)
+        // To replace for JDBC CacheStore
+        // SingleFileStore CacheStore
+        // .persistence().passivation(false).addSingleFileStore().location("/tmp/JDGDATA").shared(false).purgeOnStartup(false).fetchPersistentState(true).ignoreModifications(false).preload(true)//.threadPoolSize(i).shutdownTimeout(l).modificationQueueSize(i).flushLockTimeout(l)
+        // db persistence
+        .persistence().addStore(JdbcStringBasedStoreConfigurationBuilder.class)
+           .preload(true)
+           .ignoreModifications(false)
+           .purgeOnStartup(false)
+           .shared(true)
+           .table()
+              .tableNamePrefix("JDG")
+              .dropOnExit(false)
+              .createOnStart(true)
+              // MySQL Table Columns
+              .idColumnName("name").idColumnType("VARCHAR(50)")
+              .dataColumnName("DATA_COLUMN").dataColumnType("BLOB")
+              .timestampColumnName("TIMESTAMP_COLUMN").timestampColumnType("BIGINT")			         
+              // Oracle Table
+              //			         .idColumnName("ID_COLUMN").idColumnType("VARCHAR(255)")
+              //			         .dataColumnName("DATA_COLUMN").dataColumnType("RAW(1000)")
+              //			         .timestampColumnName("TIMESTAMP_COLUMN").timestampColumnType("NUMBER")
+              .connectionPool()
+                 .connectionUrl("jdbc:mysql://localhost:3306/jdgtest")
+                 .username("jdguser")
+                 .password("jdguser")
+                 .driverClass("com.mysql.jdbc.jdbc2.optional.MysqlXADataSource")
+//        .dataSource().jndiUrl("java:/jboss/datasources/jdgtest")                 
+        .build();
+	}
+	
+	private Configuration createRDS_ASYNC_WRITE_BEHIND_DIST_Configuration() {
+		log.info(LOG_PREFIX+"RDS_ASYNC_WRITE_BEHIND_DIST Configured)");
+		return new ConfigurationBuilder().jmxStatistics()
+				// indexing
+				.indexing().enable().indexLocalOnly(true)//.withProperties(createIndexingProps())  // Indexing Enabled
+//				        .addProperty("hibernate.search.default.directory_provider", "ram") //other options "filesystem" or "infinispan" (in the grid)
+				        .addProperty("lucene_version", "LUCENE_CURRENT")
+				        .addProperty("default.directory_provider", "infinispan")
+//				        .addProperty("default.indexmanager", "near-real-time")
+				        // Takes longer than near-real-time by 20+ secs can we utilize near-real-time for infinispan directory?				        
+				        .addProperty("default.indexmanager", "org.infinispan.query.indexmanager.InfinispanIndexManager")
+				        .addProperty("default.exclusive_index_use", "false")
+				        .addProperty("default.metadata_cachename", "lucene_metadata_repl")
+				        .addProperty("default.data_cachename", "lucene_data_dist")
+				        .addProperty("default.locking_cachename", "lucene_locking_repl")
+//								        .addProperty("default.directory_provider", "filesystem")
+//								        .addProperty("default.indexBase", "/tmp/JDG_INDEX")
+		        // more lucene properties eg. hibernate.search.lucene_version etc. can be added.build(true));
+		        // locking
+				.locking().isolationLevel(IsolationLevel.REPEATABLE_READ).concurrencyLevel(32).lockAcquisitionTimeout(10000).useLockStriping(false).writeSkewCheck(false).supportsConcurrentUpdates(true)
+		        // eviction 
+				// Disabled, All entries wil be both in memory and in cachestore (write through/behind) in order to reload the cache at restart
+				.eviction().maxEntries(-1)
+				// expiration
+				// Disable background reaper and set idle time to infinite, no expiration
+				.expiration().disableReaper().lifespan(-1).maxIdle(-1).wakeUpInterval(-1) 
+				// transactions
+				.transaction().cacheStopTimeout(30000).completedTxTimeout(150000).reaperWakeUpInterval(1000).eagerLockingSingleNode(false)
+				.syncCommitPhase(true).syncRollbackPhase(false).useEagerLocking(false).useSynchronization(false).lockingMode(LockingMode.PESSIMISTIC)
+				.transactionMode(TransactionMode.TRANSACTIONAL).autoCommit(true).use1PcForAutoCommitTransactions(false).transactionProtocol(TransactionProtocol.DEFAULT)
+				.recovery().enabled(false) //Not possible for ASYNC
+				// batching
+				.invocationBatching().enable() // Possible needed for writing multiple entries into cache
+				
+        .clustering().cacheMode(CacheMode.DIST_ASYNC)
+		 .hash().capacityFactor(0f)// TODO - NOTE THIS IS SET TO CAPACITY-FACTOR=0 NO DATA WILL BE KEPT HERE
+        .async()
+        .stateTransfer().awaitInitialTransfer(true).fetchInMemoryState(true)
+        .compatibility().enabled(true)
+        // To replace for JDBC CacheStore
+        // SingleFileStore CacheStore
+		//.persistence().passivation(false).addSingleFileStore().location("/tmp/JDGDATA").async().shared(false).purgeOnStartup(false).fetchPersistentState(true).ignoreModifications(false).preload(true)//.threadPoolSize(i).shutdownTimeout(l).modificationQueueSize(i).flushLockTimeout(l)
+        // db persistence
+        .persistence().addStore(JdbcStringBasedStoreConfigurationBuilder.class).async().enabled(true).modificationQueueSize(1000).threadPoolSize(1000)
+           .preload(true)
+           .ignoreModifications(false)
+           .purgeOnStartup(false)
+           .shared(true)
+           .table()
+              .dropOnExit(false)
+              .createOnStart(true)
+              .tableNamePrefix("JDG")
+              // MySQL Table Columns
+              .idColumnName("name").idColumnType("VARCHAR(50)")
+              .dataColumnName("DATA_COLUMN").dataColumnType("BLOB")
+              .timestampColumnName("TIMESTAMP_COLUMN").timestampColumnType("BIGINT")			         
+              // Oracle Table
+              //			         .idColumnName("ID_COLUMN").idColumnType("VARCHAR(255)")
+              //			         .dataColumnName("DATA_COLUMN").dataColumnType("RAW(1000)")
+              //			         .timestampColumnName("TIMESTAMP_COLUMN").timestampColumnType("NUMBER")
+              .connectionPool()
+                 .connectionUrl("jdbc:mysql://localhost:3306/jdgtest")
+                 .username("jdguser")
+                 .password("jdguser")
+                 .driverClass("com.mysql.jdbc.jdbc2.optional.MysqlXADataSource")              
+//              .async()     
+//        .dataSource().jndiUrl("java:/jboss/datasources/jdgtest")                 
+        .build();
+	}
+	
+	private Configuration create_lucene_locking_repl_Configuration() {
+		log.info(LOG_PREFIX+"Creating cache with createRDS_SYNC_DIST_Configuration()");
+		return new ConfigurationBuilder().jmxStatistics().clustering().cacheMode(CacheMode.REPL_ASYNC)
+				.build();
+	}
+
+	private Configuration create_lucene_data_dist_Configuration() {
+		log.info(LOG_PREFIX+"Creating cache with create_lucene_data_dist_Configuration()");
+		return new ConfigurationBuilder().jmxStatistics().clustering().cacheMode(CacheMode.DIST_ASYNC)
+//				// Disabled, All entries wil be both in memory and in cachestore (write through/behind) in order to reload the cache at restart
+//				.eviction().maxEntries(-1)
+//				// expiration
+//				// Disable background reaper and set idle time to infinite, no expiration
+//				.expiration().disableReaper().lifespan(-1).maxIdle(-1).wakeUpInterval(-1) 				
+//		        // To replace for JDBC CacheStore
+//		        // SingleFileStore CacheStore
+//		        // .persistence().passivation(false).addSingleFileStore().location("/tmp/JDGDATA").shared(false).purgeOnStartup(false).fetchPersistentState(true).ignoreModifications(false).preload(true)//.threadPoolSize(i).shutdownTimeout(l).modificationQueueSize(i).flushLockTimeout(l)
+//		        // db persistence
+////		        .persistence().addStore(JdbcMixedStoreConfigurationBuilder.class)
+//                .persistence().addStore(JdbcStringBasedStoreConfigurationBuilder.class)
+//                .key2StringMapper(org.infinispan.lucene.LuceneKey2StringMapper.class)
+////		        .addProperty("key2StringMapperClass", "org.infinispan.lucene.LuceneKey2StringMapper")
+//		           .preload(true)
+//		           .ignoreModifications(false)
+//		           .purgeOnStartup(false)
+//		           .shared(true)
+////		           .binaryTable()
+//		           .table()
+//		              .tableNamePrefix("JDG")
+//		              .dropOnExit(false)
+//		              .createOnStart(true)
+//		              // MySQL Table Columns
+//		              .idColumnName("ID").idColumnType("VARCHAR(255)")
+//		              .dataColumnName("DATA_COLUMN").dataColumnType("BLOB")
+//                      .timestampColumnName("TIMESTAMP_COLUMN").timestampColumnType("BIGINT")			         
+//		              // Oracle Table
+//		              //			         .idColumnName("ID_COLUMN").idColumnType("VARCHAR(255)")
+//		              //			         .dataColumnName("DATA_COLUMN").dataColumnType("RAW(1000)")
+//		              //			         .timestampColumnName("TIMESTAMP_COLUMN").timestampColumnType("NUMBER")
+//		              .connectionPool()
+//		                 .connectionUrl("jdbc:mysql://localhost:3306/jdgtest")
+//		                 .username("jdguser")
+//		                 .password("jdguser")
+//		                 .driverClass("com.mysql.jdbc.jdbc2.optional.MysqlXADataSource")
+//		              .async()
+				.build();
+	}
+
+	private Configuration create_lucene_metadata_repl_Configuration() {
+		log.info(LOG_PREFIX+"Creating cache with create_lucene_metadata_repl_Configuration()");
+		return new ConfigurationBuilder().jmxStatistics().clustering().cacheMode(CacheMode.REPL_ASYNC)
+//				// Disabled, All entries wil be both in memory and in cachestore (write through/behind) in order to reload the cache at restart
+//				.eviction().maxEntries(-1)
+//				// expiration
+//				// Disable background reaper and set idle time to infinite, no expiration
+//				.expiration().disableReaper().lifespan(-1).maxIdle(-1).wakeUpInterval(-1) 				
+//		        // To replace for JDBC CacheStore
+//		        // SingleFileStore CacheStore
+//		        // .persistence().passivation(false).addSingleFileStore().location("/tmp/JDGDATA").shared(false).purgeOnStartup(false).fetchPersistentState(true).ignoreModifications(false).preload(true)//.threadPoolSize(i).shutdownTimeout(l).modificationQueueSize(i).flushLockTimeout(l)
+//		        // db persistence
+////		        .persistence().addStore(JdbcMixedStoreConfigurationBuilder.class)
+//                .persistence().addStore(JdbcStringBasedStoreConfigurationBuilder.class)
+//                   .key2StringMapper(org.infinispan.lucene.LuceneKey2StringMapper.class)
+//                   .preload(true)
+//		           .ignoreModifications(false)
+//		           .purgeOnStartup(false)
+//		           .shared(true)
+////		           .binaryTable()
+//		           .table()
+//		              .tableNamePrefix("JDG")
+//		              .dropOnExit(false)
+//		              .createOnStart(true)
+//		              // MySQL Table Columns
+//		              .idColumnName("ID").idColumnType("VARCHAR(255)")
+//		              .dataColumnName("DATA_COLUMN").dataColumnType("BLOB")	
+//		              .timestampColumnName("TIMESTAMP_COLUMN").timestampColumnType("BIGINT")			         
+//
+//		              // Oracle Table
+//		              //			         .idColumnName("ID_COLUMN").idColumnType("VARCHAR(255)")
+//		              //			         .dataColumnName("DATA_COLUMN").dataColumnType("RAW(1000)")
+//		              //			         .timestampColumnName("TIMESTAMP_COLUMN").timestampColumnType("NUMBER")
+//		              .connectionPool()
+//		                 .connectionUrl("jdbc:mysql://localhost:3306/jdgtest")
+//		                 .username("jdguser")
+//		                 .password("jdguser")
+//		                 .driverClass("com.mysql.jdbc.jdbc2.optional.MysqlXADataSource")
+//		              .async()
+				.build();
+	}
+	
+	private Configuration createDefaultCacheConfiguration() {
+		// TODO Auto-generated method stub
+		return new ConfigurationBuilder().jmxStatistics()
+//				// indexing
+//				.indexing().enable()//.withProperties(createIndexingProps())  // Indexing Enabled
+//		        .addProperty("hibernate.search.default.directory_provider", "ram") //other options "filesystem" or "infinispan" (in the grid)
+//		        .addProperty("lucene_version", "LUCENE_CURRENT")
+//		        // more lucene properties eg. hibernate.search.lucene_version etc. can be added.build(true));
+//		        // locking
+//				.locking().isolationLevel(IsolationLevel.REPEATABLE_READ).concurrencyLevel(32).lockAcquisitionTimeout(10000).useLockStriping(false).writeSkewCheck(false).supportsConcurrentUpdates(true)
+//		        // eviction 
+//				// Disabled, All entries wil be both in memory and in cachestore (write through/behind) in order to reload the cache at restart
+//				.eviction().maxEntries(-1)
+//				// expiration
+//				// Disable background reaper and set idle time to infinite, no expiration
+//				.expiration().disableReaper().lifespan(-1).maxIdle(-1).wakeUpInterval(-1) 
+//				// transactions
+//				.transaction().cacheStopTimeout(30000).completedTxTimeout(150000).reaperWakeUpInterval(1000).eagerLockingSingleNode(false)
+//				.syncCommitPhase(true).syncRollbackPhase(false).useEagerLocking(false).useSynchronization(false).lockingMode(LockingMode.PESSIMISTIC)
+//				.transactionMode(TransactionMode.TRANSACTIONAL).autoCommit(true).use1PcForAutoCommitTransactions(false).transactionProtocol(TransactionProtocol.DEFAULT)
+//				.recovery().enabled(false)
+//				// batching
+//				.invocationBatching().enable() // Possible needed for writing multiple entries into cache
+				.build();
+	}
+	
+	private Properties createIndexingProps() {
+		SearchMapping mapping = new SearchMapping();
+		mapping.entity(DerivativeProduct.class).indexed().providedId()
+		.property("name", ElementType.METHOD).field()
+		.property("formulaprice", ElementType.METHOD).field()
+		.property("formulaline", ElementType.METHOD).field();
+		
+		Properties properties = new Properties();
+		properties.put(org.hibernate.search.Environment.MODEL_MAPPING, mapping);
+		properties.put("hibernate.search.default.directory_provider", "ram");
+		 properties.put("lucene_version", "LUCENE_CURRENT");
+		 
+		 log.info("Indexing properties set ["+properties+"]");		 
+		 
+		return properties;
+	}
+
+	private EmbeddedCacheManager createCacheManagerFromXml() throws IOException {
+//		return new DefaultCacheManager("udm-jdg-replication.xml"); // SingleFile/LevelDB cachestore
+		return new DefaultCacheManager("rds-jdg-cache-config.xml");
+	}
+
+
+	@PreDestroy
+	public void cleanUp() {
+		cacheManager.stop();
+		cacheManager = null;
+	}	
+}
